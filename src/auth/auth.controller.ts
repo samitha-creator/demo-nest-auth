@@ -1,17 +1,31 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   NotImplementedException,
+  Param,
+  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  //Login Endpoint
+  constructor(private authService: AuthService) {}
+
   @HttpCode(HttpStatus.OK)
-  @Get('login')
-  login() {
-    throw new NotImplementedException('Not implemented');
+  @Post('login')
+  login(@Body() input: { username: string; password: string }) {
+    return this.authService.authenticate(input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('me')
+  profile(@Request() request: any) {
+    return request.user;
   }
 }
