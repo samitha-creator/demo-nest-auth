@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 
 type AuthInput = { username: string; password: string };
-type SigninData = { userId: number };
+type SigninData = { userId: number; name: string };
 type AuthResult = { accessToken: string };
 
 @Injectable()
@@ -27,6 +27,7 @@ export class AuthService {
     if (user && user.password == input.password) {
       return {
         userId: user.id,
+        name: user.username,
       };
     }
     return null;
@@ -35,6 +36,7 @@ export class AuthService {
   private async signIn(user: SigninData): Promise<AuthResult> {
     const tokenPayload = {
       sub: user.userId,
+      name: user.name,
     };
     const accessToken = await this.jwtService.signAsync(tokenPayload);
     return { accessToken };

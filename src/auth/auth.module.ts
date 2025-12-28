@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { UsersModule } from 'src/users/users.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   providers: [AuthService],
@@ -11,8 +11,11 @@ import { JwtModule } from '@nestjs/jwt';
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: 'a-string-secret-at-least-256-bits-long',
-      signOptions: { expiresIn: '1d' },
+      secret: 'Jtb25nb0lEIjoiNjY2OWE0OGVjF3a4fc2aGGd3',
+      signOptions: { 
+        expiresIn: '1d',
+        issuer: 'APK Hub Pvt. Ltd',
+       },
     }),
   ],
 })
