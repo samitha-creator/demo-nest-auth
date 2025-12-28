@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/routes/users/users.service';
 
 type AuthInput = { username: string; password: string };
 type SigninData = { userId: number; name: string };
@@ -40,5 +40,9 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.signAsync(tokenPayload);
     return { accessToken };
+  }
+
+  async register() {
+    
   }
 }
