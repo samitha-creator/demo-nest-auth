@@ -1,8 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/routes/users/users.service';
+import { UsersService } from 'src/endpoints/users/users.service';
 
-type AuthInput = { username: string; password: string };
+import { CreateUserDto } from '../users/dto/create-user.dto';
+
+type AuthInput = CreateUserDto;
 type SigninData = { userId: number; name: string };
 type AuthResult = { accessToken: string };
 
@@ -42,7 +44,12 @@ export class AuthService {
     return { accessToken };
   }
 
-  async register() {
-    
+  async register(input: AuthInput): Promise<AuthResult> {
+    const existingUser = await this.usersService.findUserByName(input.username);
+    if (existingUser) {
+        throw new UnauthorizedException('User already exists');
+    }
+    const user = await this.usersService.createUser(input);
+    return this.signIn({ userId: user.id, name: user.username });
   }
 }
