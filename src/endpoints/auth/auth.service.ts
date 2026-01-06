@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcrypt';
 import { UsersService } from 'src/endpoints/users/users.service';
 
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -24,9 +25,19 @@ export class AuthService {
     return this.signIn(user);
   }
 
+  async register(input: AuthInput): Promise<number> {
+    const existingUser = await this.usersService.findUserByName(input.username);
+    if (existingUser) {
+      throw new UnauthorizedException('User already exists');
+    }
+    const user = await this.usersService.createUser(input);
+    return user.id;
+  }
+
+  // MARK:- private functions
   private async validateUser(input: AuthInput): Promise<SigninData | null> {
     const user = await this.usersService.findUserByName(input.username);
-    if (user && user.password == input.password) {
+    if (user && (await compare(input.password, user.password))) {
       return {
         userId: user.id,
         name: user.username,
@@ -42,14 +53,5 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.signAsync(tokenPayload);
     return { accessToken };
-  }
-
-  async register(input: AuthInput): Promise<AuthResult> {
-    const existingUser = await this.usersService.findUserByName(input.username);
-    if (existingUser) {
-        throw new UnauthorizedException('User already exists');
-    }
-    const user = await this.usersService.createUser(input);
-    return this.signIn({ userId: user.id, name: user.username });
   }
 }
