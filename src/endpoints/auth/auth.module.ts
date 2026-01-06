@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../../endpoints/users/users.module';
 import { AuthController } from './auth.controller';
@@ -9,13 +10,17 @@ import { AuthService } from './auth.service';
   controllers: [AuthController],
   imports: [
     UsersModule,
-    JwtModule.register({
+    ConfigModule,
+    JwtModule.registerAsync({
       global: true,
-      secret: 'Jtb25nb0lEIjoiNjY2OWE0OGVjF3a4fc2aGGd3',
-      signOptions: {
-        expiresIn: '1d',
-        issuer: 'APK Hub Pvt. Ltd',
-      },
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: '1d',
+          issuer: 'APK Hub Pvt. Ltd',
+        },
+      }),
     }),
   ],
 })
