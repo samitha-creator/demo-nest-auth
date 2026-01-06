@@ -1,3 +1,4 @@
+import { Role } from 'src/endpoints/auth/enums/role.enum';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Bid } from './Bid.entity';
 import { Review } from './Review.entity';
@@ -13,6 +14,13 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
 
   @OneToMany(() => Task, (task) => task.owner)
   tasksOwned: Task[];
